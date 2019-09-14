@@ -24,13 +24,13 @@ export default class Editor extends React.Component {
     return (
       <div>
         <Header ChangeStartNote={this.ChangeStartNote} ChangeEndNote={this.ChangeEndNote}/>
-        <div style={{ position: 'sticky', top: '0px', zIndex: '1001'}}>
-          <Line/>
-        </div>
         <div className="" style={{margin: '15px', overflow: 'scroll', height: '800px', border: '1px solid rgba(0, 0, 0, 0.23)'}}>
+          <div  style={{position: '-webkit-sticky', position: 'sticky', top: '0px', zIndex: '1001'}}>
+            <Line/>
+          </div>
           <TimeLine/>
           <div style={{display: 'flex'}}>
-            <div className="" style={{position: 'sticky', left: '0px', zIndex: '999'}}>
+            <div className="" style={{position: '-webkit-sticky', position: 'sticky', left: '0px', zIndex: '999'}}>
               <LeftPianoRoll noteStart={this.state.note_start} noteEnd={this.state.note_end}/>
             </div>
             <div className="" style={{margin: '0px', zIndex: '998'}}>
