@@ -3,22 +3,30 @@ import './css/App.css';
 import Constants from './Constants';
 import Player from '../../node_modules/midi-player-js';
 import Mario from './midi/mario-midi.js';
-import Buns from './midi/hot-cross-buns-midi.js';
 
 class App extends Component {
-  constructor() {
-    super();
+  static getDerivedStateFromProps(props, state) {
+    if (props.noteStart !== state.note_start || props.noteEnd !== state.note_end) {
+      state.contstants.init(props.noteStart, props.noteEnd)
+      return { note_start: props.noteStart, note_end: props.noteEnd };
+    }
+    return null;
+  }
+  constructor(props) {
+    super(props);
     // How wide in pixels a single beat should be.
-    this.beat_pixel_length = 40;
-
-    // Initialize MIDI parser/player
-    this.midiPlayer = new Player.Player();
-    this.midiPlayer.on('playing', function(tick) {
-      if (tick.tick % 20 == 0) {
-        //console.log(tick)
-        this.handlePlayTick(tick.tick);
-      }
-    }.bind(this));
+      this.beat_pixel_length = 40;
+      // Initialize Constants
+      this.contstants = new Constants();
+      this.contstants.init(this.props.noteStart, this.props.noteEnd);
+      // Initialize MIDI parser/player
+      this.midiPlayer = new Player.Player();
+      this.midiPlayer.on('playing', function(tick) {
+        if (tick.tick % 20 == 0) {
+          //console.log(tick)
+          this.handlePlayTick(tick.tick);
+        }
+      }.bind(this));
 
     this.midiPlayer.loadDataUri(Mario);
     //this.midiPlayer.play();
@@ -28,9 +36,12 @@ class App extends Component {
       selectedTrack:    0,
       currentTick:      0,
       midiEvents:       this.midiPlayer.events[0],
-      tickPixelLength:  this.beat_pixel_length / this.midiPlayer.division
+      tickPixelLength:  this.beat_pixel_length / this.midiPlayer.division,
+      note_start: this.props.noteStart,
+      note_end: this.props.noteEnd,
+      contstants: new Constants(),
     };
-
+    
     this.settingState = false;
 
     // Bind methods to this
@@ -80,37 +91,26 @@ class App extends Component {
   render() {
     var options = this.midiPlayer.tracks.map((element, index) => <option key={index}>{index}</option>);
     var rows = [];
-
-    Constants.NOTES.forEach(function(noteObject) {
+    this.state.contstants.init(this.state.note_start, this.state.note_end)
+    // Constants.NOTES.forEach(function(noteObject) {
+    //   rows.push(<Row key={noteObject.midiNumber} midiNumber={noteObject.midiNumber} midiEvents={this.state.midiEvents} appState={this.state} />);
+    // }.bind(this));
+    this.state.contstants.getNotes().forEach(function(noteObject) {
       rows.push(<Row key={noteObject.midiNumber} midiNumber={noteObject.midiNumber} midiEvents={this.state.midiEvents} appState={this.state} />);
     }.bind(this));
 
     return (
-      <div className="App">
-        <div className="App-header">
-          <div>
-            <input type="file" onChange={this.handleFileChange} />
-            { this.state.error && <p>{this.state.error}</p> }
-          </div>
-          <p>
-            <label>Select Track</label>
-            <select onChange={this.handleTrackChange} style={{"color": "#000"}}>{options}</select>
-          </p>
-        </div>
-        <Piano />
-        <div className="Roll">
-          <div className="beat-lines"></div>
-          {rows}
-          <div className="Playhead" style={{transform: 'translate(' + this.state.currentTick * this.state.tickPixelLength + 'px)'}}></div>
-        </div>
-      </div>
+        <Piano noteStart={this.state.note_start} noteEnd={this.state.note_end} contstants={this.state.contstants}/>
     );
   }
 }
 
 class Piano extends Component {
   render() {
-    const rows = Constants.NOTES.map(noteObject => {
+    // const rows = Constants.NOTES.map(noteObject => {
+    //   return <PianoRow key={noteObject.midiNumber} midiNumber={noteObject.midiNumber} noteName={noteObject.noteName} />;
+    // });
+    const rows = this.props.contstants.getNotes().map(noteObject => {
       return <PianoRow key={noteObject.midiNumber} midiNumber={noteObject.midiNumber} noteName={noteObject.noteName} />;
     });
 
