@@ -67,13 +67,13 @@ export default function GroupedSelect(props) {
         </Select>
       </FormControl>
       </div>
-      <div className="text-center" style={{paddingLeft: '10px', paddingTop: '20px'}}>
+      {/* <div className="text-center" style={{paddingLeft: '10px', paddingTop: '20px'}}>
           <ButtonGroup size="small" aria-label="small outlined button group">
             <Button onClick={props.play}><PlayArrowIcon/>Play</Button>
             <Button><PauseIcon/>Pause</Button>
             <Button><StopIcon/>Stop</Button>
           </ButtonGroup>
-      </div>
+      </div> */}
     </div>
   );
 }

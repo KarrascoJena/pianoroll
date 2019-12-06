@@ -22,7 +22,7 @@ export default class TimeLine extends React.Component {
       timeLine.push(<div style={{width: '400px', height: '20px', border: '1px solid rgba(0, 0, 0, 0.23)', backgroundColor: '#555', color: 'white', fontSize: '12px'}}>{i}</div>)
     }
     return (
-      <div id="timeline" style={{display: 'flex', width: width, position: '-webkit-sticky', position: 'sticky', top: '0px', zIndex: '1000'}}>
+      <div id="timeline" style={{display: 'flex', width: width, position: '-webkit-sticky', position: 'sticky', top: '50px', zIndex: '1000'}}>
         {timeLine}
       </div>
     );
