@@ -433,7 +433,7 @@ var DefaultResizeHandleComponent = function DefaultResizeHandleComponent(_ref) {
       x = _ref.x,
       y = _ref.y;
   return React__default.createElement("rect", {
-    fill: active ? 'rgba(229,240,244,1)' : 'rgba(229,240,244,0.3)',
+    fill: active ? 'rgba(229,240,244,1)' : 'rgba(229,240,244,1)',
     height: recommendedSize,
     stroke: active ? 'rgba(53,33,140,1)' : 'rgba(53,33,140,0.3)',
     strokeWidth: 1 / scale,

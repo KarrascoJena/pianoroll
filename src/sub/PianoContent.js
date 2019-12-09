@@ -31,14 +31,13 @@ export default class PianoContent extends React.Component {
       vectorWidth: 3200,
       vectorHeight: 180*(this.props.noteEnd - this.props.noteStart + 1),
       note_start: this.props.noteStart,
-      note_end: this.props.noteEnd
+      note_end: this.props.noteEnd,
+      actionType: false
     };
-    console.log(this.state.note_end - this.state.note_start)
   }
 
   mouseClick = (e) => {
     var obj = document.getElementById('pianoroll').getBoundingClientRect();
-    console.log(obj)
     if(e.type == 'contextmenu'){
       var key = e.returnValue
       var items = this.state.items
@@ -49,18 +48,24 @@ export default class PianoContent extends React.Component {
       event.preventDefault();
 
     } else {
-      var x = e.screenX-obj.x
-      var y = e.screenY-obj.top-70
-      console.log(e.screenY + " " + obj.y)
-      var width = 23
-      var height = 15
-      this.setState(state => ({
-        items: [
-          ...state.items,
-          { id: `id${idIterator}`, x, y, width, height },
-        ],
-      }));
-      idIterator += 1;
+      if(!this.state.actionType){
+        var x = e.screenX-obj.x
+        var y = e.screenY-obj.top-70
+        var re = (x%25)
+        x = x - re;
+        var re = (y%15)
+        y = y - re;
+        var width = 23
+        var height = 15
+        this.setState(state => ({
+          items: [
+            ...state.items,
+            { id: `id${idIterator}`, x, y, width, height },
+          ],
+        }));
+        idIterator += 1
+      }
+      this.setState({actionType: false})
     }
   };
   render() {
@@ -87,13 +92,22 @@ export default class PianoContent extends React.Component {
                   width={width}
                   x={x}
                   y={y}
-                  onChange={newRect => {
+                  onChange={(newRect, event) => {
+                    var re = newRect.x%25
+                    newRect.x = newRect.x - re
+                    var re = newRect.y%15
+                    if(re > 7){
+                      newRect.y = newRect.y + 15 - re
+                    }else {
+                      newRect.y = newRect.y - re
+                    }
                     this.setState(state => ({
                       items: arrayReplace(state.items, index, {
                         ...item,
                         ...newRect,
                       }),
                     }));
+                    this.setState({actionType: true})
                   }}
                   onDelete={() => {
                     this.setState(state => ({

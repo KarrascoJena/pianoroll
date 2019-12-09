@@ -23,7 +23,6 @@ class App extends Component {
       this.midiPlayer = new Player.Player();
       this.midiPlayer.on('playing', function(tick) {
         if (tick.tick % 20 == 0) {
-          //console.log(tick)
           this.handlePlayTick(tick.tick);
         }
       }.bind(this));
@@ -79,7 +78,6 @@ class App extends Component {
   }
 
   handlePlayTick(tick) {
-    //console.log(tick)
     if (!this.settingState) {
       this.settingState = true;
       this.setState({currentTick: tick}, function() {

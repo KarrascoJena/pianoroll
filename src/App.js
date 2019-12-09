@@ -29,9 +29,7 @@ export default class Editor extends React.Component {
             <Line/>
           </div>
           <TimeLine/>
-
           <div style={{display: 'flex'}}>
-            
             <div className="" style={{position: '-webkit-sticky', position: 'sticky', left: '0px', zIndex: '999'}}>
               <LeftPianoRoll noteStart={this.state.note_start} noteEnd={this.state.note_end}/>
             </div>

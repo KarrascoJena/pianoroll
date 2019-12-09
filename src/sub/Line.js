@@ -28,8 +28,6 @@ export default class Line extends React.Component {
     this.setState({interval:  setInterval(() => {
       length += 1;
       this.setState({length: length})
-      console.log("state length = ", this.state.length)
-      console.log(length)
     }, 10)})
   }
 
