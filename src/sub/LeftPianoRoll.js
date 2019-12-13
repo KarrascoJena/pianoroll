@@ -22,7 +22,7 @@ class App extends Component {
       // Initialize MIDI parser/player
       this.midiPlayer = new Player.Player();
       this.midiPlayer.on('playing', function(tick) {
-        if (tick.tick % 20 == 0) {
+        if (tick.tick % 20 === 0) {
           this.handlePlayTick(tick.tick);
         }
       }.bind(this));
@@ -87,7 +87,6 @@ class App extends Component {
   }
 
   render() {
-    var options = this.midiPlayer.tracks.map((element, index) => <option key={index}>{index}</option>);
     var rows = [];
     this.state.contstants.init(this.state.note_start, this.state.note_end)
     // Constants.NOTES.forEach(function(noteObject) {

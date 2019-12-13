@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShapeEditor, ImageLayer, DrawLayer, wrapShape } from '../react-shape-editor'
+import { ShapeEditor, ImageLayer, wrapShape } from '../react-shape-editor'
 function arrayReplace(arr, index, item) {
   return [
     ...arr.slice(0, index),
@@ -20,6 +20,9 @@ export default class PianoContent extends React.Component {
       var vectorHeight = 180*(props.noteEnd - props.noteStart + 1)
       return { vectorHeight: vectorHeight };
     }
+    if (props.contentLength !== state.length ) {
+      return { length: props.contentLength, vectorWidth: props.contentLength*400 };
+    }
     return null;
   }
 
@@ -28,6 +31,7 @@ export default class PianoContent extends React.Component {
 
     this.state = {
       items: [],
+      length: this.props.contentLength,
       vectorWidth: 3200,
       vectorHeight: 180*(this.props.noteEnd - this.props.noteStart + 1),
       note_start: this.props.noteStart,
@@ -37,8 +41,7 @@ export default class PianoContent extends React.Component {
   }
 
   mouseClick = (e) => {
-    var obj = document.getElementById('pianoroll').getBoundingClientRect();
-    if(e.type == 'contextmenu'){
+    if(e.type === 'contextmenu'){
       var key = e.returnValue
       var items = this.state.items
       items = items.filter(function( obj ) {
@@ -49,21 +52,23 @@ export default class PianoContent extends React.Component {
 
     } else {
       if(!this.state.actionType){
-        var x = e.screenX-obj.x
-        var y = e.screenY-obj.top-70
-        var re = (x%25)
-        x = x - re;
-        var re = (y%15)
-        y = y - re;
-        var width = 23
-        var height = 15
-        this.setState(state => ({
-          items: [
-            ...state.items,
-            { id: `id${idIterator}`, x, y, width, height },
-          ],
-        }));
-        idIterator += 1
+        if(e.target.className.animVal === "rse-plane-container"){
+          var x = e.nativeEvent.offsetX
+          var y = e.nativeEvent.offsetY
+          var re = (x%25)
+          x -= re;
+          re = (y%15)
+          y -= re;
+          var width = 23
+          var height = 15
+          this.setState(state => ({
+            items: [
+              ...state.items,
+              { id: `id${idIterator}`, x, y, width, height },
+            ],
+          }));
+          idIterator += 1
+        }
       }
       this.setState({actionType: false})
     }
@@ -93,28 +98,40 @@ export default class PianoContent extends React.Component {
                   x={x}
                   y={y}
                   onChange={(newRect, event) => {
-                    var re = newRect.x%25
-                    newRect.x = newRect.x - re
-                    var re = newRect.y%15
-                    if(re > 7){
-                      newRect.y = newRect.y + 15 - re
-                    }else {
-                      newRect.y = newRect.y - re
+                    if(width === newRect.width){
+                      var re = newRect.x%25
+                      newRect.x -= re
+                      re = newRect.y%15
+                      if(re > 7){
+                        newRect.y = newRect.y + 15 - re
+                      }else {
+                        newRect.y -= re
+                      }
+                      this.setState(state => ({
+                        items: arrayReplace(state.items, index, {
+                          ...item,
+                          ...newRect,
+                        }),
+                      }));
+                      this.setState({actionType: true})
+                    } else {
+                      if(newRect.x < x) {
+                        newRect.x = x;
+                        newRect.width = 25;
+                      }
+                      this.setState(state => ({
+                        items: arrayReplace(state.items, index, {
+                          ...item,
+                          ...newRect,
+                        }),
+                      }));
+                      this.setState({actionType: true})
                     }
-                    this.setState(state => ({
-                      items: arrayReplace(state.items, index, {
-                        ...item,
-                        ...newRect,
-                      }),
-                    }));
-                    this.setState({actionType: true})
                   }}
                   onDelete={() => {
                     this.setState(state => ({
                       items: arrayReplace(state.items, index, []),
                     }));
-                  }}
-                  onChildToggleSelection={() => {
                   }}
                 />
               );

@@ -4,6 +4,7 @@ import {Motion, spring} from 'react-motion';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import ReplayIcon from '@material-ui/icons/Replay';
 import PauseIcon from '@material-ui/icons/Pause';
 import StopIcon from '@material-ui/icons/Stop';
 
@@ -12,48 +13,83 @@ export default class Line extends React.Component {
     super(props);
     this.state = {
       open: false,
-      length: 100,
+      length: 115,
       interval: null,
-      lineStatus: false
+      flgPlayPause: false,
+      bpm: 120,
     };
   };
   
-  handleMouseDown = () => {
-    this.setState({open: !this.state.open})
-    this.setState({lineStatus: true})
-    this.startTimeInterval(100)
-  };
-
   startTimeInterval = (length) => {
     this.setState({interval:  setInterval(() => {
-      length += 1;
+      length += 1*(this.state.bpm/120);
       this.setState({length: length})
     }, 10)})
   }
 
+  play = () => {
+    this.setState({open: true})
+    this.setState({flgPlayPause: !this.state.flgPlayPause})
+    if(this.state.flgPlayPause){
+      clearInterval(this.state.interval)
+    } else {
+      this.startTimeInterval(this.state.length)
+    }
+  };
+
   stope = () => {
     clearInterval(this.state.interval)
-    this.setState({open: !this.state.open})
-    this.setState({lineStatus: false})
+    this.setState({open: false})
+    this.setState({length: 115})
+    this.setState({flgPlayPause: false})
+  }
+
+  replay = () => {
+    clearInterval(this.state.interval)
+    this.setState({
+      open: true,
+      length: 115,
+      flgPlayPause: true
+    })
+    setTimeout(() => {
+      this.startTimeInterval(115)
+    }, 1000)
+  }
+
+  bpmChange = (e) => {
+    this.setState({bpm: e.target.value})
+  }
+
+  lengthChange = (e) => {
+    this.setState({contentLength: e.target.value})
   }
 
   render() {
     return (
       <div>
-        <div className="text-center" style={{paddingLeft: '10px', paddingTop: '20px', backgroundColor: '#FFF'}}>
-          <ButtonGroup size="small" aria-label="small outlined button group">
-            {/* <Button onClick={props.play}><PlayArrowIcon/>Play</Button> */}
-            <Button onClick={this.handleMouseDown} disabled={this.state.lineStatus} ><PlayArrowIcon/>Play</Button>
-            <Button disabled={!this.state.lineStatus}><PauseIcon/>Pause</Button>
-            <Button onClick={this.stope} disabled={!this.state.lineStatus} ><StopIcon/>Stop</Button>
-          </ButtonGroup>
+        <div className="text-center" style={{paddingLeft: '20px', paddingTop: '20px', backgroundColor: '#FFF'}}>
+          <form className="form-inline">
+            <div className="form-check mb-2 mr-sm-2 mb-sm-0">
+              <ButtonGroup size="small" aria-label="small outlined button group">
+                <Button onClick={this.play}>{this.state.flgPlayPause ? <PauseIcon/>:<PlayArrowIcon/>}</Button>
+                <Button onClick={this.replay}><ReplayIcon/></Button>
+                <Button onClick={this.stope}><StopIcon/></Button>
+              </ButtonGroup>
+            </div>
+            <div className="input-group mb-2 mr-sm-2 mb-sm-0">
+              <div className="input-group-addon tool-element">BPM</div>
+              <input type="number" className="form-control tool-element" id="inlineFormInputGroup" onChange={this.bpmChange} placeholder="" value={this.state.bpm} style={{marginLeft: '-3px', width: '70px'}}/>
+            </div>
+            <div className="input-group mb-2 mr-sm-2 mb-sm-0">
+              <div className="input-group-addon tool-element">length</div>
+              <input type="number" className="form-control tool-element" id="inlineFormInputGroup" onChange={this.props.ChangeContentLength} placeholder="" value={this.props.contentLength} style={{marginLeft: '-3px', width: '70px'}}/>
+            </div>
+          </form>
         </div>
         <div style={{height: '0px', overflow: 'visible'}}>
-          <Motion style={{x: spring(this.state.open ? this.state.length : 100)}}>
+          <Motion style={{x: spring(this.state.open ? this.state.length : 115)}}>
             {({x}) =>
-              // children is a callback which should accept the current value of
-              // `style`
-                <div className="demo0-block" style={{position: 'relative', left: `${x}px`, height:'750px', width: '2px'}} />
+                <div className="demo0-block" style={{position: 'relative', left: `${x}px`, top: '36px', height:'760px', width: '2px'}} />
             }
           </Motion>
         </div>

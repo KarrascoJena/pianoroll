@@ -366,8 +366,6 @@ function (_Component) {
 
       var _this$props = this.props,
           children = _this$props.children,
-          focusOnAdd = _this$props.focusOnAdd,
-          focusOnDelete = _this$props.focusOnDelete,
           scale = _this$props.scale,
           vectorHeight = _this$props.vectorHeight,
           vectorWidth = _this$props.vectorWidth,
@@ -829,21 +827,14 @@ function wrapShape(WrappedComponent) {
         var _this4 = this;
 
         var _this$props6 = this.props,
-            constrainMove = _this$props6.constrainMove,
-            constrainResize = _this$props6.constrainResize,
             getPlaneCoordinatesFromEvent = _this$props6.getPlaneCoordinatesFromEvent,
             isInternalComponent = _this$props6.isInternalComponent,
-            keyboardTransformMultiplier = _this$props6.keyboardTransformMultiplier,
             _onBlur = _this$props6.onBlur,
-            onChange = _this$props6.onChange,
             onChildFocus = _this$props6.onChildFocus,
-            onChildRectChanged = _this$props6.onChildRectChanged,
             onChildToggleSelection = _this$props6.onChildToggleSelection,
             onDelete = _this$props6.onDelete,
             _onFocus = _this$props6.onFocus,
-            onIntermediateChange = _this$props6.onIntermediateChange,
             _onKeyDown = _this$props6.onKeyDown,
-            onShapeMountedOrUnmounted = _this$props6.onShapeMountedOrUnmounted,
             ResizeHandleComponent = _this$props6.ResizeHandleComponent,
             setMouseHandler = _this$props6.setMouseHandler,
             wrapperProps = _this$props6.wrapperProps,
@@ -903,7 +894,6 @@ function wrapShape(WrappedComponent) {
         var RECOMMENDED_CORNER_SIZE = 5;
         var cornerSize = RECOMMENDED_CORNER_SIZE / scale;
         var hasSpaciousVertical = (sides.bottom - sides.top) * scale > RECOMMENDED_CORNER_SIZE * 2;
-        var hasSpaciousHorizontal = (sides.right - sides.left) * scale > RECOMMENDED_CORNER_SIZE * 2; // Generate drag handles
 
         var handles = [hasSpaciousVertical && ['e', 'se', 'ew-resize', width, height / 2, 'y']].filter(function (a) {
           return a;
@@ -1219,13 +1209,9 @@ function (_Component) {
     key: "render",
     value: function render() {
       var _this$props = this.props,
-          onLoad = _this$props.onLoad,
-          src = _this$props.src,
           otherProps = _objectWithoutProperties(_this$props, ["onLoad", "src"]);
 
-      var _this$state = this.state,
-          naturalHeight = _this$state.naturalHeight,
-          naturalWidth = _this$state.naturalWidth;
+      var _this$state = this.state
       return React__default.createElement("image", _extends({
         // href: src,
         // width: naturalWidth,
@@ -1474,7 +1460,6 @@ var defaultDragState$2 = {
   dragCurrentCoordinates: null,
   isMouseDown: false
 };
-var SelectionContext = React__default.createContext(null);
 var SELECTION_COMPONENT_SHAPE_ID = 'rse-internal-selection-component';
 
 var getNextRectOfSelectionChild = function getNextRectOfSelectionChild(selectionStartRect, selectionEndRect, childRect) {
