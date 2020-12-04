@@ -8,6 +8,20 @@ function arrayReplace(arr, index, item) {
   ];
 }
 
+function PianorollContentClass(noteLength) {
+  switch (noteLength){
+    case 6:
+      return "piano-roll-row-16";
+    case 12:
+      return "piano-roll-row-8";
+    case 24:
+      return "piano-roll-row-4";
+    case 48:
+      return "piano-roll-row-2";
+    default:
+      return "piano-roll-row-4";
+  }
+}
 const RectShape = wrapShape(({ width, height }) => (
   <rect width={width} height={height} fill="rgba(0,0,255,0.5)"/>
 ));
@@ -16,12 +30,13 @@ let idIterator = 1;
 
 export default class PianoContent extends React.Component {
   static getDerivedStateFromProps(props, state) {
-    if (props.noteStart !== state.note_start || props.noteEnd !== state.note_end) {
-      var vectorHeight = 180*(props.noteEnd - props.noteStart + 1)
-      return { vectorHeight: vectorHeight };
+
+    if (props.noteStart !== state.note_start || props.noteEnd !== state.note_end || props.gridSize !== state.noteLength || props.noteItems !== state.items) {
+      var vectorHeight = 15*(props.noteEnd - props.noteStart + 1)
+      return { vectorHeight: vectorHeight, noteLength: props.gridSize, items: props.noteItems };
     }
-    if (props.contentLength !== state.length ) {
-      return { length: props.contentLength, vectorWidth: props.contentLength*400 };
+    if (props.contentLength !== state.length) {
+      return { length: props.contentLength, vectorWidth: props.contentLength*384 };
     }
     return null;
   }
@@ -30,104 +45,31 @@ export default class PianoContent extends React.Component {
     super(props);
 
     this.state = {
-      items: [],
+      items: this.props.noteItems,
       length: this.props.contentLength,
-      vectorWidth: 3200,
-      vectorHeight: 180*(this.props.noteEnd - this.props.noteStart + 1),
+      vectorWidth: 3072,
+      vectorHeight: 15*(this.props.noteEnd - this.props.noteStart + 1),
       note_start: this.props.noteStart,
       note_end: this.props.noteEnd,
-      actionType: false
+      actionType: false,
+      noteLength: this.props.gridSize,
     };
   }
-
-  mouseClick = (e) => {
-    if(e.type === 'contextmenu'){
-      var key = e.returnValue
-      var items = this.state.items
-      items = items.filter(function( obj ) {
-        return obj.id !== key;
-      });
-      this.setState({items: items})
-      event.preventDefault();
-
-    } else {
-      if(!this.state.actionType){
-        if(e.target.className.animVal === "rse-plane-container"){
-          var x = e.nativeEvent.offsetX
-          var y = e.nativeEvent.offsetY
-          var re = (x%25)
-          x -= re;
-          re = (y%15)
-          y -= re;
-          var width = 23
-          var height = 15
-          this.setState(state => ({
-            items: [
-              ...state.items,
-              { id: `id${idIterator}`, x, y, width, height },
-            ],
-          }));
-          idIterator += 1
-        }
-      }
-      this.setState({actionType: false})
-    }
-  };
+  
   render() {
     const { items, vectorWidth, vectorHeight } = this.state;
-
+    const ContentClass = PianorollContentClass(parseInt(this.state.noteLength))
     return (
       <div>
-        <div className="piano-roll-row piano-roll-coll" onClick={this.mouseClick.bind(this)} onContextMenu={this.mouseClick.bind(this)} id="pianoroll">
+        <div className={ContentClass} onClick={this.props.mouseClick} onContextMenu={this.props.mouseClick} id="pianoroll">
           <ShapeEditor vectorWidth={vectorWidth} vectorHeight={vectorHeight}>
-            <ImageLayer
-              data-id='123'
-              src="./assets/whiteback.png"
-              onLoad={({ naturalWidth, naturalHeight }) => {
-              }}
-            />
+            <ImageLayer data-id='123' src="./assets/whiteback.png" onLoad={({ naturalWidth, naturalHeight }) => {}}/>
             
             {items.map((item, index) => {
               const { id, height, width, x, y } = item;
               return (
-                <RectShape
-                  key={id}
-                  shapeId={id}
-                  height={height}
-                  width={width}
-                  x={x}
-                  y={y}
-                  onChange={(newRect, event) => {
-                    if(width === newRect.width){
-                      var re = newRect.x%25
-                      newRect.x -= re
-                      re = newRect.y%15
-                      if(re > 7){
-                        newRect.y = newRect.y + 15 - re
-                      }else {
-                        newRect.y -= re
-                      }
-                      this.setState(state => ({
-                        items: arrayReplace(state.items, index, {
-                          ...item,
-                          ...newRect,
-                        }),
-                      }));
-                      this.setState({actionType: true})
-                    } else {
-                      if(newRect.x < x) {
-                        newRect.x = x;
-                        newRect.width = 25;
-                      }
-                      this.setState(state => ({
-                        items: arrayReplace(state.items, index, {
-                          ...item,
-                          ...newRect,
-                        }),
-                      }));
-                      this.setState({actionType: true})
-                    }
-                  }}
+                <RectShape key={id} shapeId={id} height={height} width={width} x={x} y={y}
+                  onChange={(newRect) => this.props.onChange(newRect, event, x, y, width, height, index, item)}
                   onDelete={() => {
                     this.setState(state => ({
                       items: arrayReplace(state.items, index, []),

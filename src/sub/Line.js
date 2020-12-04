@@ -17,7 +17,8 @@ export default class Line extends React.Component {
       interval: null,
       flgPlayPause: false,
       bpm: 120,
-      gridSize: 4
+      gridSize: this.props.gridSize,
+      timeSignature: 24
     };
   };
   
@@ -29,6 +30,8 @@ export default class Line extends React.Component {
   }
 
   play = () => {
+    this.props.playBack()
+
     this.setState({open: true})
     this.setState({flgPlayPause: !this.state.flgPlayPause})
     if(this.state.flgPlayPause){
@@ -64,9 +67,11 @@ export default class Line extends React.Component {
   lengthChange = (e) => {
     this.setState({contentLength: e.target.value})
   }
-  gridChange = () => {
-    this.setState({gridSize: 4})
+
+  ChangeTimeSignature = (e) => {
+    alert("133123123")
   }
+
   render() {
     return (
       <div>
@@ -85,16 +90,26 @@ export default class Line extends React.Component {
             </div>
             <div className="input-group mb-2 mr-sm-2 mb-sm-0">
               <div className="input-group-addon tool-element">length</div>
-              <input type="number" className="form-control tool-element" id="inlineFormInputGroup" onChange={this.props.ChangeContentLength} placeholder="" value={this.props.contentLength} style={{marginLeft: '-3px', width: '70px'}}/>
+              <input type="number" className="form-control tool-element" id="inlineFormInputGroup" onChange={this.props.changeContentLength} placeholder="" value={this.props.contentLength} style={{marginLeft: '-3px', width: '70px'}}/>
             </div>
             <div className="input-group mb-2 mr-sm-2 mb-sm-0">
-            <div className="input-group-addon tool-element">grid</div>
-              <select className="form-control tool-element" defaultValue={this.state.gridSize} onChange={this.props.gridChange} style={{width: '100px'}}>
-                <option value="2">2/1</option>
-                <option value="4">4/1</option>
-                <option value="8">8/1</option>
-                <option value="16">16/1</option>
+              <div className="input-group-addon tool-element">grid</div>
+              <select className="form-control tool-element" defaultValue={this.state.gridSize} onChange={this.props.changeGridSize} style={{width: '100px'}}>
+                <option value="48">2/1</option>
+                <option value="24">4/1</option>
+                <option value="12">8/1</option>
+                <option value="6">16/1</option>
               </select>
+            </div>
+            <div className="input-group mb-2 mr-sm-2 mb-sm-0">
+              <div className="input-group-addon tool-element">time signature</div>
+              <select className="form-control tool-element" defaultValue={this.state.timeSignature} onChange={this.props.ChangeTimeSignature} style={{width: '100px'}}>
+                <option value="48">8/3</option>
+                <option value="24">4/4</option>
+              </select>
+            </div>
+            <div className="input-group mb-2 mr-sm-2 mb-sm-0" style={{alignItems: 'center'}}>
+              <input type="checkbox" onClick={this.props.onlyOneNode}/> <label> &nbsp;only one note on colum</label>
             </div>
           </form>
         </div>

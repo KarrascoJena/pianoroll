@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import './css/App.css';
 import Constants from './Constants';
-import Player from '../../node_modules/midi-player-js';
-import Mario from './midi/mario-midi.js';
+import Soundfont from 'soundfont-player';
+
 
 class App extends Component {
   static getDerivedStateFromProps(props, state) {
@@ -19,23 +19,8 @@ class App extends Component {
       // Initialize Constants
       this.contstants = new Constants();
       this.contstants.init(this.props.noteStart, this.props.noteEnd);
-      // Initialize MIDI parser/player
-      this.midiPlayer = new Player.Player();
-      this.midiPlayer.on('playing', function(tick) {
-        if (tick.tick % 20 === 0) {
-          this.handlePlayTick(tick.tick);
-        }
-      }.bind(this));
-
-    this.midiPlayer.loadDataUri(Mario);
-    //this.midiPlayer.play();
 
     this.state = {
-      error:            null,
-      selectedTrack:    0,
-      currentTick:      0,
-      midiEvents:       this.midiPlayer.events[0],
-      tickPixelLength:  this.beat_pixel_length / this.midiPlayer.division,
       note_start: this.props.noteStart,
       note_end: this.props.noteEnd,
       contstants: new Constants(),
@@ -43,59 +28,14 @@ class App extends Component {
     
     this.settingState = false;
 
-    // Bind methods to this
-    this.handleTrackChange = this.handleTrackChange.bind(this);
-    this.handleFileChange = this.handleFileChange.bind(this);
-    this.handlePlayTick = this.handlePlayTick.bind(this);
-  }
-
-  handleTrackChange(event) {
-    this.setState({
-      selectedTrack:  event.target.value,
-      midiEvents:     this.midiPlayer.events[event.target.value]
-    });
-  }
-
-  handleFileChange(event) {
-    var reader  = new FileReader();
-
-    reader.onload = function(e) {
-      try {
-        this.midiPlayer.loadArrayBuffer(e.target.result);
-        this.setState({
-          error:            null, 
-          midiEvents:       this.midiPlayer.events[0],
-          tickPixelLength:  this.beat_pixel_length / this.midiPlayer.division
-        });
-
-      } catch(e) {
-        this.setState({error: e});
-      }
-      
-    }.bind(this);
-
-    reader.readAsArrayBuffer(event.target.files[0]);
-  }
-
-  handlePlayTick(tick) {
-    if (!this.settingState) {
-      this.settingState = true;
-      this.setState({currentTick: tick}, function() {
-        this.settingState = false;
-      }.bind(this));
-    }
   }
 
   render() {
     var rows = [];
     this.state.contstants.init(this.state.note_start, this.state.note_end)
-    // Constants.NOTES.forEach(function(noteObject) {
-    //   rows.push(<Row key={noteObject.midiNumber} midiNumber={noteObject.midiNumber} midiEvents={this.state.midiEvents} appState={this.state} />);
-    // }.bind(this));
     this.state.contstants.getNotes().forEach(function(noteObject) {
       rows.push(<Row key={noteObject.midiNumber} midiNumber={noteObject.midiNumber} midiEvents={this.state.midiEvents} appState={this.state} />);
     }.bind(this));
-
     return (
         <Piano noteStart={this.state.note_start} noteEnd={this.state.note_end} contstants={this.state.contstants}/>
     );
@@ -104,9 +44,6 @@ class App extends Component {
 
 class Piano extends Component {
   render() {
-    // const rows = Constants.NOTES.map(noteObject => {
-    //   return <PianoRow key={noteObject.midiNumber} midiNumber={noteObject.midiNumber} noteName={noteObject.noteName} />;
-    // });
     const rows = this.props.contstants.getNotes().map(noteObject => {
       return <PianoRow key={noteObject.midiNumber} midiNumber={noteObject.midiNumber} noteName={noteObject.noteName} />;
     });
@@ -120,9 +57,20 @@ class Piano extends Component {
 }
 
 class PianoRow extends Component {
+
+  clickNode = (midiNumber) => {
+    // console.log(midiNumber)
+    var ac = new AudioContext()
+    Soundfont.instrument(ac, 'acoustic_grand_piano', { soundfont: 'MusyngKite' }).then(function (AcousticGrandPiano) {
+      midiNumber = 12*7-midiNumber
+      var note = `${midiNumber}`
+      AcousticGrandPiano.play(note, ac.currentTime, { duration: 0.5})
+    })
+  }
+
   render() {
     return (
-      <div className="PianoRow" data-midi-number={this.props.midiNumber}>
+      <div className="PianoRow" data-midi-number={this.props.midiNumber} onClick={() => this.clickNode(this.props.midiNumber)}>
         {this.props.noteName}
       </div>
     );
