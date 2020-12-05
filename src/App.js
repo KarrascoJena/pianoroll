@@ -155,7 +155,7 @@ export default class Editor extends React.Component {
         this.setState({actionType: true})
         this.SingleSound(newRect.y/15)
       }
-       else {
+      else {
         if(newRect.x < x) {
           newRect.x = x;
           newRect.width = this.state.gridSize;

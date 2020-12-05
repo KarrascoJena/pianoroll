@@ -26,7 +26,7 @@ export default class Line extends React.Component {
     this.setState({interval:  setInterval(() => {
       length += 1*(this.state.bpm/120);
       this.setState({length: length})
-    }, 10)})
+    }, 20)})
   }
 
   play = () => {
